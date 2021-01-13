@@ -6,6 +6,8 @@ class HomeController extends Controller {
   async index() {
     const { ctx } = this;
     console.log('xxxxxx');
+    const a = [ 'aa', 'bb' ];
+    a;
     ctx.body = 'hi, egg';
   }
 }
