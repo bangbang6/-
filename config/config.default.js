@@ -1,7 +1,7 @@
 /* eslint valid-jsdoc: "off" */
 
 'use strict';
-
+// 默认配置
 /**
  * @param {Egg.EggAppInfo} appInfo app info
  */
@@ -26,5 +26,21 @@ module.exports = appInfo => {
   return {
     ...config,
     ...userConfig,
+    security: {
+      csrf: { enable: false },
+    },
+    // 配置egg链接到Mongo
+    mongoose: {
+      client: {
+        url: 'mongodb://127.0.0.1:27017/kkbfile', // 默认端口+数据库  需要先启动本地Mongo才能链接到
+        options: {},
+      },
+    },
+    password: {
+      secret: 'bang',
+    },
+    jwt: {
+      secret: 'bangbang66', // 会被合并到appconfig里面去
+    },
   };
 };
