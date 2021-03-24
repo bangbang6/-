@@ -2,7 +2,9 @@
 
 const BaseController = require('./base');
 const svgcaptcha = require('svg-captcha');
+const path = require('path');
 const fse = require('fs-extra');
+
 class UtilController extends BaseController {
   async captcha() {
     const { ctx } = this;
@@ -20,16 +22,35 @@ class UtilController extends BaseController {
   async uploadfile() {
     const { ctx } = this;
     const file = ctx.request.files[0];
-    console.log('file', file);
+    const { name, hash } = ctx.request.body;
+    const chunkPath = path.resolve(this.config.UPLOAD_DIR, hash);
+    if (!fse.existsSync(chunkPath)) {
+      fse.mkdir(chunkPath);
+    }
     try {
-      await fse.move(file.filepath, this.config.UPLOAD_DIR + '/' + file.filename);
+      await fse.move(file.filepath, `${chunkPath}/${name}`);
 
     } catch (e) {
       this.error('文件失败');
     }
     this.success({
-      url: `/public/${file.filename}`,
+      url: `/public/${chunkPath}/${name}`,
     });
+  }
+  async merge() {
+    const { ext, size, hash } = this.ctx.request.body;
+    const destPath = path.resolve(this.config.UPLOAD_DIR, `${hash}.${ext}`); // 最终合并后文件的存储
+
+    try {
+      await this.ctx.service.user.mergeFile(destPath, hash, size);
+      this.success({
+        message: '合并成功',
+        url: `/public/${hash}.${ext}`,
+      });
+    } catch (e) {
+      this.error(e.message);
+    }
+
   }
 }
 
