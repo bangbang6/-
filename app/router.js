@@ -9,6 +9,7 @@ module.exports = app => {
   router.get('/', controller.home.index);
   router.post('/uploadfile', controller.util.uploadfile);
   router.post('/merge', controller.util.merge);
+  router.post('/checkFile', controller.util.checkFile);
   router.get('/captcha', jwtMid, controller.util.captcha); // !对应conrroller文件夹下的util文件的chaptha方法
   router.group({ name: 'user', prefix: '/user' }, router => {
     const { info, register, login, verify, sendEmailCode } = controller.user;

@@ -51,7 +51,7 @@ class UserService extends Service {
     });
     await Promise.all(
       chunks.map((file, index) => {
-        return pipStream(file, fse.createWriteStream(destPath, {
+        return pipStream(file, fse.createWriteStream(destPath, { // 在destPath的这个文件的第start-end字节里写数据
           start: index * size,
           end: (index + 1) * size,
         }));

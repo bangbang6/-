@@ -20,6 +20,10 @@ class UtilController extends BaseController {
     ctx.body = captcha.data;
   }
   async uploadfile() {
+    if (Math.random() < 0.2) {
+      this.ctx.status = 500;
+      return;
+    }
     const { ctx } = this;
     const file = ctx.request.files[0];
     const { name, hash } = ctx.request.body;
@@ -50,6 +54,31 @@ class UtilController extends BaseController {
     } catch (e) {
       this.error(e.message);
     }
+
+  }
+  async checkFile() {
+    const { ctx } = this;
+    const { ext, hash } = ctx.request.body;
+
+    const filePath = path.resolve(this.config.UPLOAD_DIR, `${hash}.${ext}`); // 文件存在的目录
+    let uploaded = false;
+    let uploadedList = [];
+    if (fse.existsSync(filePath)) {
+      uploaded = true;
+    } else {
+      uploadedList = await this.getUploadedList(path.resolve(this.config.UPLOAD_DIR, hash));
+    }
+    this.success({
+      uploaded,
+      uploadedList,
+    });
+  }
+  async getUploadedList(chunkDir) {
+    if (fse.existsSync(chunkDir)) {
+      const uploadedList = await fse.readdirSync(chunkDir).filter(name => name[0] !== '.'); // 过滤隐藏文件
+      return uploadedList;
+    }
+    return [];
 
   }
 }
